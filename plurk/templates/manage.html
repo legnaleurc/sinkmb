@@ -1,0 +1,53 @@
+{% extends "skeleton.html" %}
+{% load i18n %}
+
+{% block page_title %}SinKMB - Manage Plurk{% endblock %}
+
+{% block head_hook %}
+	<script type="text/javascript" src="/static/plurk-manage.js"></script>
+{% endblock %}
+
+{% block page_body %}
+	<h3>Current Real ID</h3>
+	<table class="zebra-striped">
+		<thead>
+			<tr><th>#</th><th>Real ID</th><th>{% trans 'Account' %}</th></tr>
+		</thead>
+		<tbody>
+			{% for realID in realIDs %}
+				<tr>
+					<td>{{ forloop.counter }}</td>
+					<td>{{ realID.0 }}</td>
+					<td>{{ realID.1 }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<form action="." method="post">
+		<fieldset>
+			<div class="clearfix{% if form.realID.errors %} error{% endif %}">
+				{{ form.realID.label_tag }}
+				<div class="input">
+					<input class="xlarge" id="id_realID" type="text" name="{{ form.realID.html_name }}" placeholder="{{ form.realID.help_text }}" />
+					{% for error in form.realID.errors %}
+						<span class="help-inline">{{ error }}</span>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="clearfix{% if form.account.errors %} error{% endif %}">
+				{{ form.account.label_tag }}
+				<div class="input">
+					<select class="xlarge" id="id_account" name="{{ form.account.html_name }}"></select>
+					{% for error in form.account.errors %}
+						<span class="help-inline">{{ error }}</span>
+					{% endfor %}
+				</div>
+			</div>
+			{% csrf_token %}
+		</fieldset>
+		<div class="actions">
+			<input type="reset" class="btn" />
+			<input type="submit" class="btn primary" />
+		</div>
+	</form>
+{% endblock %}

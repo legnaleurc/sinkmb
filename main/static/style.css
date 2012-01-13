@@ -1,0 +1,24 @@
+/* Page Style */
+
+body {
+	padding-top: 40px;
+}
+
+.topbar div.input {
+	margin: 5px 0 0 0;
+}
+
+#stdin {
+	width: 100%;
+	margin: 10px 0 10px 0;
+}
+
+/* Generic Post Style */
+
+#stdout > * {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-top: 1px solid gray;
+}

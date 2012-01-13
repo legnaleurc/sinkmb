@@ -1,0 +1,51 @@
+{% extends "skeleton.html" %}
+{% load i18n %}
+
+{% block page_title %}SinKMB{% endblock %}
+
+{% block head_hook %}
+	{% if user.is_authenticated %}
+		<script type="text/javascript" src="{{ STATIC_URL }}post.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}action.js"></script>
+	{% endif %}
+	{% for head in heads %}
+		{{ head }}
+	{% endfor %}
+{% endblock %}
+
+{% block page_head_right %}
+	{% if not user.is_authenticated %}
+		<form action="." method="post" class="pull-right">
+			<input class="input-small" type="text" placeholder="{{ form.username.label }}" name="{{ form.username.html_name }}" />
+			<input class="input-small" type="password" placeholder="{{ form.password.label }}" name="{{ form.password.html_name }}" />
+			<button class="btn" type="submit">{% trans 'Sign in' %}</button>
+			{% csrf_token %}
+		</form>
+	{% else %}
+		{{ block.super }}
+	{% endif %}
+{% endblock %}
+
+{% block page_body %}
+	{% if user.is_authenticated %}
+		<div class="row span10">
+			<div class="input">
+				<textarea id="stdin"></textarea>
+				<div class="row">
+					<div class="span1">
+						<span id="word-counter" class="label">0</span>
+					</div>
+					<div class="offset8 span1">
+						<button class="btn primary" type="submit">{% trans 'Submit' %}</button>
+					</div>
+				</div>
+			</div>
+			<div id="stdout">
+			</div>
+		</div>
+		<div class="span6">
+		</div>
+	{% else %}
+		<h1>You have to <a href="{% url main.views.register %}">Sign up</a> or <strong>Sign in</strong>.</h1>
+	{% endif %}
+{% endblock %}

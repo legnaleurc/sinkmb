@@ -1,0 +1,17 @@
+private/settings.py
+autoload
+dbindexer
+django
+djangoappengine
+djangotoolbox
+httplib2
+main/static/bootstrap.css
+main/static/jquery.js
+oauth2
+plurk_oauth
+tweepy
+*~
+*.pyc
+.gaedata
+.DS_Store
+Thumbs.db

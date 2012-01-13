@@ -1,0 +1,43 @@
+{% extends "skeleton.html" %}
+{% load i18n %}
+
+{% block page_title %}SinKMB - Register{% endblock %}
+
+{% block page_body %}
+	<form method="post" action=".">
+		<fieldset>
+			<div class="clearfix{% if form.username.errors %} error{% endif %}">
+				{{ form.username.label_tag }}
+				<div class="input">
+					<input class="xlarge" id="id_username" type="text" name="{{ form.username.html_name }}" placeholder="{{ form.username.help_text }}" />
+					{% for error in form.username.errors %}
+						<span class="help-inline">{{ error }}</span>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="clearfix{% if form.password1.errors %} error{% endif %}">
+				{{ form.password1.label_tag }}
+				<div class="input">
+					<input class="xlarge" id="id_password1" type="password" name="{{ form.password1.html_name }}" placeholder="{{ form.password1.help_text }}" />
+					{% for error in form.password1.errors %}
+						<span class="help-inline">{{ error }}</span>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="clearfix{% if form.password2.errors %} error{% endif %}">
+				{{ form.password2.label_tag }}
+				<div class="input">
+					<input class="xlarge" id="id_password2" type="password" name="{{ form.password2.html_name }}" placeholder="{{ form.password2.help_text }}" />
+					{% for error in form.password2.errors %}
+						<span class="help-inline">{{ error }}</span>
+					{% endfor %}
+				</div>
+			</div>
+			{% csrf_token %}
+		</fieldset>
+		<div class="actions">
+			<input class="btn" type="reset" />
+			<input class="btn primary" type="submit" />
+		</div>
+	</form>
+{% endblock %}

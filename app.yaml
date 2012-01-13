@@ -1,0 +1,53 @@
+application: sinkmb
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+builtins:
+- remote_api: on
+
+inbound_services:
+- warmup
+
+libraries:
+- name: django
+  version: latest
+
+handlers:
+- url: /_ah/queue/deferred
+  script: djangoappengine.deferred.handler.application
+  login: admin
+
+- url: /_ah/stats/.*
+  script: djangoappengine.appstats.application
+
+- url: /media/admin
+  static_dir: django/contrib/admin/media
+  expiration: '0'
+
+- url: /favicon\.ico
+  static_files: main/static/images/favicon.ico
+  upload: main/static/images/favicon.ico
+
+- url: /.*
+  script: djangoappengine.main.application
+  secure: always
+
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?docs
+- ^(.*/)?tests
+- ^(.*/)?tests\.py
+- ^(.*/)?django(js)?\.po
+- ^(.*/)?README.*
+- ^(.*/)?LICENSE.*
+- ^(.*/)?MANIFEST.*
