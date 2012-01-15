@@ -36,7 +36,7 @@
 
 		this.notifier.click( function() {
 			var self = SinKMB.timeline;
-			self.notifier.hide();
+			self.notifier.slideUp();
 			var nNews = self.newPosts.length;
 			self.posts = self.newPosts.concat( self.posts );
 			self.newPosts = [];
