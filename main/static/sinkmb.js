@@ -1,3 +1,20 @@
+// for JavaScript 1.8.5 support
+if( !Function.prototype.bind ) {
+	Function.prototype.bind = function( oThis ) {
+		if( typeof this !== "function" ) {
+			// closest thing possible to the ECMAScript 5 internal IsCallable function
+			throw new TypeError( "Function.prototype.bind - what is trying to be bound is not callable" );
+		}
+		var aArgs = Array.prototype.slice.call( arguments, 1 ), fToBind = this, fNOP = function () {
+		}, fBound = function () {
+			return fToBind.apply( this instanceof fNOP ? this : oThis || window, aArgs.concat( Array.prototype.slice.call( arguments ) ) );
+		};
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+		return fBound;
+	};
+}
+
 var SinKMB = {
 
 	bind: function( fn ) {
@@ -49,24 +66,20 @@ var SinKMB = {
 	 * @brief Update timeline since last updated.
 	 */
 	updateTimeline: function() {
-		if( !SinKMB.lock( SinKMB.services.length ) ) {
-			return;
-		}
-		$( SinKMB.services ).each( function() {
-			this.getTimeline( function( post ) {
-				SinKMB.manager.insert( post );
-			} );
+//		if( !SinKMB.lock( SinKMB.services.length ) ) {
+//			return;
+//		}
+		SinKMB.timeline.more( 20, function() {
+			SinKMB.timeline.show( 0, 20 );
 		} );
 	},
 
 	moreHistory: function() {
-		if( !SinKMB.lock( SinKMB.services.length ) ) {
-			return;
-		}
-		$( SinKMB.services ).each( function() {
-			this.getHistory( function( post ) {
-				SinKMB.manager.insert( post );
-			} );
+//		if( !SinKMB.lock( SinKMB.services.length ) ) {
+//			return;
+//		}
+		SinKMB.timeline.more( 20, function() {
+			SinKMB.timeline.show( -1, 20 );
 		} );
 	},
 

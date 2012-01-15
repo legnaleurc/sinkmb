@@ -7,7 +7,117 @@
 		} );
 	}
 
-	function renderPost( status ) {
+	function onStatusAdded( srv, callback, data, textStatus, message ) {
+		if( textStatus !== 'success' || data === null ) {
+			// TODO handle error
+			SinKMB.unlock();
+			return;
+		}
+		if( data.length === 0 ) {
+			// empty timeline, do nothing
+			SinKMB.unlock();
+			return;
+		}
+		// update latest status id
+		if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
+			srv.latestStatusID = data[0].id_str;
+		}
+		// update oldest status id
+		if( srv.oldestStatusID === null || data[data.length - 1].id_str < srv.oldestStatusID ) {
+			srv.oldestStatusID = data[data.length - 1].id_str;
+		}
+		$( data ).each( function() {
+			this.timestamp = new Date( this.timestamp );
+			var widget = renderPost( this );
+			callback( {
+				data: this,
+				widget: widget,
+			} );
+		} );
+
+		// release lock
+		SinKMB.unlock();
+	}
+
+	function onStatusReceived( srv, callback, data, textStatus, message ) {
+		if( textStatus !== 'success' || data === null ) {
+			SinKMB.unlock();
+			return;
+		}
+		if( data.length === 0 ) {
+			SinKMB.unlock();
+			return;
+		}
+		// update latest status id
+		if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
+			srv.latestStatusID = data[0].id_str;
+		}
+		// update oldest status id
+		if( srv.oldestStatusID === null || data[data.length - 1].id_str < srv.oldestStatusID ) {
+			srv.oldestStatusID = data[data.length - 1].id_str;
+		}
+
+		srv.newPostsQueue = srv.newPostsQueue.concat( data );
+		// release lock
+		SinKMB.unlock();
+	}
+
+	function Twitter() {
+		// call super
+		SinKMB.AbstractService.apply( this, arguments );
+
+		this.latestStatusID = null;
+		this.oldestStatusID = null;
+	}
+	Twitter.prototype = new SinKMB.AbstractService();
+	Twitter.prototype.constructor = Twitter;
+
+	Twitter.prototype.post = function( message ) {
+		jQuery.post( '/twitter/update.cgi', {
+			message: message,
+		}, function( data, textStatus, message ) {
+			if( textStatus !== 'success' || data === null ) {
+				// TODO handle error
+				return;
+			}
+			// TODO report success
+		}, 'json' );
+	};
+
+	/// Override
+	Twitter.prototype.pullHistory = function() {
+		var args = {};
+		if( this.oldestStatusID !== null ) {
+			// minus 1 because max_id compares less than or equal
+			args.max_id = parseInt( this.oldestStatusID, 10 ) - 1;
+		}
+		jQuery.post( '/twitter/home_timeline.cgi', args, SinKMB.bind( function( srv, data, textStatus, message ) {
+			if( textStatus !== 'success' || data === null ) {
+				return;
+			}
+			if( data.length === 0 ) {
+				return;
+			}
+
+			// update latest status id
+			if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
+				srv.latestStatusID = data[0].id_str;
+			}
+			// update oldest status id
+			if( srv.oldestStatusID === null || data[data.length - 1].id_str < srv.oldestStatusID ) {
+				srv.oldestStatusID = data[data.length - 1].id_str;
+			}
+
+			$( data ).each( function() {
+				srv.pushPost( new SinKMB.Post( this, srv ) );
+			} );
+
+			// NOTE must call
+			srv.pullFinished();
+		}, this ), 'json' );
+	};
+
+	Twitter.prototype.renderPost = function( status ) {
 		var body = $( '<div class="twitter row" />' );
 
 		var left = $( '<div class="span1" />' );
@@ -79,55 +189,6 @@
 			return this.nodeType === 3;
 		} ).text();
 		return body.append( left ).append( right );
-	}
-
-	function onStatusAdded( srv, callback, data, textStatus, message ) {
-		if( textStatus !== 'success' || data === null ) {
-			// TODO handle error
-			SinKMB.unlock();
-			return;
-		}
-		if( data.length === 0 ) {
-			// empty timeline, do nothing
-			SinKMB.unlock();
-			return;
-		}
-		// update latest status id
-		if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
-			srv.latestStatusID = data[0].id_str;
-		}
-		// update oldest status id
-		if( srv.oldestStatusID === null || data[data.length - 1].id_str < srv.oldestStatusID ) {
-			srv.oldestStatusID = data[data.length - 1].id_str;
-		}
-		$( data ).each( function() {
-			this.timestamp = new Date( this.timestamp );
-			var widget = renderPost( this );
-			callback( {
-				data: this,
-				widget: widget,
-			} );
-		} );
-
-		// release lock
-		SinKMB.unlock();
-	}
-
-	function Twitter() {
-		this.latestStatusID = null;
-		this.oldestStatusID = null;
-	}
-
-	Twitter.prototype.post = function( message ) {
-		jQuery.post( '/twitter/update.cgi', {
-			message: message,
-		}, function( data, textStatus, message ) {
-			if( textStatus !== 'success' || data === null ) {
-				// TODO handle error
-				return;
-			}
-			// TODO report success
-		}, 'json' );
 	};
 
 	Twitter.prototype.getTimeline = function( callback ) {

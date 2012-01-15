@@ -5,6 +5,8 @@
 
 {% block head_hook %}
 	{% if user.is_authenticated %}
+		<script type="text/javascript" src="{{ STATIC_URL }}timeline.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}service.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}post.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}action.js"></script>
 	{% endif %}

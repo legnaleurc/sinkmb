@@ -1,58 +1,51 @@
 ( function() {
 
-	function PostManager( selector ) {
-		this.widget = $( selector );
-		this.posts = [];
+	function Post( data, srv ) {
+		this.srv = srv;
+		this.data = data;
+		this.realID = null;
+		this.widget = null;
+		this.cleanedContent = null;
+		this.timestamp = new Date( data.timestamp );
+		this.similar = false;
 	}
 
-	PostManager.prototype.find = function( post ) {
-		var index = -1, similar = false;
-		$( this.posts ).each( function( i ) {
-			if( post.data.service !== this.data.service && post.data.real_id !== null && post.data.real_id === this.data.real_id ) {
-				// test similarity
-				var s = SinKMB.getSimilarity( post.data.cleaned_content, this.data.cleaned_content );
-				if( s[1] > 0.9 ) {
-					// found and stop
-					index = i;
-					similar = true;
-					return false;
-				}
-			}
-			if( post.data.timestamp > this.data.timestamp ) {
-				index = i;
-				return false;
-			}
-		} );
-		return {
-			index: index,
-			similar: similar,
-		};
+	Post.prototype.inDOM = function() {
+		return this.widget !== null;
 	};
 
-	PostManager.prototype.insert = function( post ) {
-		var result = this.find( post );
-		if( this.posts.length === 0 ) {
-			this.widget.append( post.widget );
-			this.posts.push( post );
-		} else if( result.index < 0 ) {
-			this.posts[this.posts.length - 1].widget.after( post.widget );
-			this.posts.push( post );
-		} else if( result.index > 0 ) {
-			this.posts[result.index].widget.before( post.widget );
-			this.posts.splice( result.index, 0, post );
-		} else {
-			this.posts[0].widget.before( post.widget );
-			this.posts.splice( 0, 0, post );
+	Post.prototype.getWidget = function() {
+		if( this.widget === null ) {
+			this.widget = this.srv.renderPost( this.data );
+			this.widget.data( 'timestamp', this.timestamp );
 		}
-		post.widget.hide();
-		if( !result.similar ) {
-			post.widget.slideDown();
-		}
-		return this;
+		return this.widget;
 	};
 
-	$( function() {
-		SinKMB.manager = new PostManager( '#stdout' );
-	} );
+	Post.prototype.getService = function() {
+		return this.srv;
+	};
+
+	Post.prototype.getRealID = function() {
+		return this.realID;
+	};
+
+	Post.prototype.getCleanedContent = function() {
+		return this.cleanedContent;
+	};
+
+	Post.prototype.getTimestamp = function() {
+		return this.timestamp;
+	};
+
+	Post.prototype.isSimilar = function() {
+		return this.similar;
+	};
+
+	Post.prototype.setSimilar = function( similar ) {
+		this.similar = similar;
+	};
+
+	SinKMB.Post = Post;
 
 } )();
