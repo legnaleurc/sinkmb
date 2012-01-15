@@ -39,9 +39,9 @@ $( function() {
 	} );
 
 	// update timeline per minute
-//	var tid = window.setInterval( SinKMB.updateTimeline, 60 * 1000 );
+	var tid = window.setInterval( SinKMB.updateTimeline, 60 * 1000 );
 
 	// load status first
-	SinKMB.updateTimeline();
+	SinKMB.loadTimeline();
 
 } );

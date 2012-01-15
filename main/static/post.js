@@ -17,6 +17,7 @@
 	Post.prototype.getWidget = function() {
 		if( this.widget === null ) {
 			this.widget = this.srv.renderPost( this.data );
+			this.widget.hide();
 			this.widget.data( 'timestamp', this.timestamp );
 		}
 		return this.widget;

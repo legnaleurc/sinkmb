@@ -5,35 +5,6 @@
 		return [ d.getUTCFullYear(), '-', d.getUTCMonth() + 1, '-', d.getUTCDate(), 'T', d.getUTCHours(), ':', d.getUTCMinutes(), ':', d.getUTCSeconds() ].join( '' );
 	}
 
-	function onPlurksAdded( srv, callback, data, textStatus, message ) {
-		if( textStatus !== 'success' || data === null ) {
-			// TODO handle error
-			SinKMB.unlock();
-			return;
-		}
-		if( data.length === 0 ) {
-			// empty timeline, do nothing
-			SinKMB.unlock();
-			return;
-		}
-		var tmp = new Date( data[data.length - 1].timestamp );
-		if( srv.oldestTimestamp > tmp ) {
-			// update oldest timestamp
-			srv.oldestTimestamp = tmp;
-		}
-		$( data ).each( function() {
-			this.timestamp = new Date( this.timestamp );
-			var widget = renderPost( this );
-			callback( {
-				data: this,
-				widget: widget,
-			} );
-		} );
-
-		// unlock a semaphore
-		SinKMB.unlock();
-	}
-
 	function Plurk() {
 		// call super
 		SinKMB.AbstractService.apply( this, arguments );
@@ -88,6 +59,33 @@
 	}
 
 	/// Override
+	Plurk.prototype.pullNew = function() {
+		jQuery.post( '/plurk/pull_plurks.cgi', {
+			offset: toOffset( this.latestTimestamp ),
+		}, SinKMB.bind( function( srv, data, textStatus, message ) {
+			if( textStatus !== 'success' || data === null ) {
+				return;
+			}
+			if( data.length === 0 ) {
+				return;
+			}
+
+			var tmp = new Date( data[0].timestamp );
+			if( srv.latestTimestamp === null || srv.latestTimestamp < tmp ) {
+				srv.latestTimestamp = tmp;
+			}
+
+			$( data ).each( function() {
+				SinKMB.timeline.addNewPost( new SinKMB.Post( this, srv ) );
+			} );
+
+			SinKMB.timeline.notifyUpdate();
+			// NOTE must call
+			srv.pullFinished();
+		}, this ), 'json' );
+	};
+
+	/// Override
 	Plurk.prototype.pullHistory = function() {
 		var args = {};
 		if( this.oldestTimestamp !== null ) {
@@ -101,7 +99,11 @@
 				return;
 			}
 
-			var tmp = new Date( data[data.length - 1].timestamp );
+			var tmp = new Date( data[0].timestamp );
+			if( srv.latestTimestamp === null || srv.latestTimestamp < tmp ) {
+				srv.latestTimestamp = tmp;
+			}
+			tmp = new Date( data[data.length - 1].timestamp );
 			if( srv.oldestTimestamp > tmp ) {
 				// update oldest timestamp
 				srv.oldestTimestamp = tmp;
@@ -114,39 +116,6 @@
 			// NOTE must call
 			srv.pullFinished();
 		}, this ), 'json' );
-	};
-
-	Plurk.prototype.getTimeline = function( callback ) {
-		if( this.latestTimestamp !== null ) {
-			this.pullPlurks( callback );
-		} else {
-			this.getPlurks( callback );
-		}
-		// update latest timestamp
-		this.latestTimestamp = new Date();
-	};
-
-	Plurk.prototype.getHistory = function( callback ) {
-		jQuery.post( '/plurk/get_plurks.cgi', {
-			offset: toOffset( this.oldestTimestamp ),
-		}, SinKMB.bind( onPlurksAdded, this, callback ), 'json' );
-	};
-
-	/**
-	 * @brief polling plurks
-	 */
-	Plurk.prototype.pullPlurks = function( callback ) {
-		jQuery.post( '/plurk/pull_plurks.cgi', {
-			offset: toOffset( this.latestTimestamp ),
-		}, SinKMB.bind( onPlurksAdded, this, callback ), 'json' );
-	};
-
-	/**
-	 * @brief get most recent 20 plurks
-	 */
-	Plurk.prototype.getPlurks = function( callback ) {
-		jQuery.post( '/plurk/get_plurks.cgi', {
-		}, SinKMB.bind( onPlurksAdded, this, callback ), 'json' );
 	};
 
 	SinKMB.services.push( new Plurk() );

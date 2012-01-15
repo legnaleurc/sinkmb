@@ -66,18 +66,20 @@ var SinKMB = {
 	 * @brief Update timeline since last updated.
 	 */
 	updateTimeline: function() {
-//		if( !SinKMB.lock( SinKMB.services.length ) ) {
-//			return;
-//		}
+		SinKMB.timeline.update( function() {
+		} );
+	},
+
+	/**
+	 * @brief Load timeline
+	 */
+	loadTimeline: function() {
 		SinKMB.timeline.more( 20, function() {
 			SinKMB.timeline.show( 0, 20 );
 		} );
 	},
 
 	moreHistory: function() {
-//		if( !SinKMB.lock( SinKMB.services.length ) ) {
-//			return;
-//		}
 		SinKMB.timeline.more( 20, function() {
 			SinKMB.timeline.show( -1, 20 );
 		} );

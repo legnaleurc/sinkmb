@@ -1,12 +1,22 @@
 ( function() {
 
 	function Service() {
-		this.newPostQueue = [];
 		this.oldPostQueue = [];
 		this.pulling = false;
 	}
 
 	Service.prototype.renderPost = function( data ) {
+		throw new TypeError( 'pure virtual function call' );
+	};
+
+	Service.prototype.update = function() {
+		if( this.pulling ) {
+			return this;
+		}
+		this.pullNew();
+	};
+
+	Service.prototype.pullNew = function() {
 		throw new TypeError( 'pure virtual function call' );
 	};
 

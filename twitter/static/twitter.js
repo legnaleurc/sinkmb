@@ -7,61 +7,6 @@
 		} );
 	}
 
-	function onStatusAdded( srv, callback, data, textStatus, message ) {
-		if( textStatus !== 'success' || data === null ) {
-			// TODO handle error
-			SinKMB.unlock();
-			return;
-		}
-		if( data.length === 0 ) {
-			// empty timeline, do nothing
-			SinKMB.unlock();
-			return;
-		}
-		// update latest status id
-		if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
-			srv.latestStatusID = data[0].id_str;
-		}
-		// update oldest status id
-		if( srv.oldestStatusID === null || data[data.length - 1].id_str < srv.oldestStatusID ) {
-			srv.oldestStatusID = data[data.length - 1].id_str;
-		}
-		$( data ).each( function() {
-			this.timestamp = new Date( this.timestamp );
-			var widget = renderPost( this );
-			callback( {
-				data: this,
-				widget: widget,
-			} );
-		} );
-
-		// release lock
-		SinKMB.unlock();
-	}
-
-	function onStatusReceived( srv, callback, data, textStatus, message ) {
-		if( textStatus !== 'success' || data === null ) {
-			SinKMB.unlock();
-			return;
-		}
-		if( data.length === 0 ) {
-			SinKMB.unlock();
-			return;
-		}
-		// update latest status id
-		if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
-			srv.latestStatusID = data[0].id_str;
-		}
-		// update oldest status id
-		if( srv.oldestStatusID === null || data[data.length - 1].id_str < srv.oldestStatusID ) {
-			srv.oldestStatusID = data[data.length - 1].id_str;
-		}
-
-		srv.newPostsQueue = srv.newPostsQueue.concat( data );
-		// release lock
-		SinKMB.unlock();
-	}
-
 	function Twitter() {
 		// call super
 		SinKMB.AbstractService.apply( this, arguments );
@@ -82,6 +27,33 @@
 			}
 			// TODO report success
 		}, 'json' );
+	};
+
+	/// Override
+	Twitter.prototype.pullNew = function() {
+		jQuery.post( '/twitter/home_timeline.cgi', {
+			since_id: this.latestStatusID,
+		}, SinKMB.bind( function( srv, data, textStatus, message ) {
+			if( textStatus !== 'success' || data === null ) {
+				return;
+			}
+			if( data.length === 0 ) {
+				return;
+			}
+
+			// update latest status id
+			if( srv.latestStatusID === null || data[0].id_str > srv.latestStatusID ) {
+				srv.latestStatusID = data[0].id_str;
+			}
+
+			$( data ).each( function() {
+				SinKMB.timeline.addNewPost( new SinKMB.Post( this, srv ) );
+			} );
+
+			SinKMB.timeline.notifyUpdate();
+			// NOTE must call
+			srv.pullFinished();
+		}, this ), 'json' );
 	};
 
 	/// Override
@@ -117,6 +89,7 @@
 		}, this ), 'json' );
 	};
 
+	/// Override
 	Twitter.prototype.renderPost = function( status ) {
 		var body = $( '<div class="twitter row" />' );
 
@@ -189,20 +162,6 @@
 			return this.nodeType === 3;
 		} ).text();
 		return body.append( left ).append( right );
-	};
-
-	Twitter.prototype.getTimeline = function( callback ) {
-		var args = {};
-		if( this.latestStatusID !== null ) {
-			args.since_id = this.latestStatusID;
-		}
-		jQuery.post( '/twitter/home_timeline.cgi', args, SinKMB.bind( onStatusAdded, this, callback ), 'json' );
-	};
-
-	Twitter.prototype.getHistory = function( callback ) {
-		jQuery.post( '/twitter/home_timeline.cgi', {
-			max_id: this.oldestStatusID,
-		}, SinKMB.bind( onStatusAdded, this, callback ), 'json' );
 	};
 
 	SinKMB.services.push( new Twitter() );
