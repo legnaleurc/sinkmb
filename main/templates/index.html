@@ -33,9 +33,6 @@
 		<div class="row span10">
 			<div class="input">
 				<textarea id="stdin"></textarea>
-				<div id="notifier" class="alert-message info">
-					View <strong id="notifier-counter"></strong> New Messages
-				</div>
 				<div class="row">
 					<div class="span1">
 						<span id="word-counter" class="label">0</span>
@@ -44,6 +41,9 @@
 						<button class="btn primary" type="submit">{% trans 'Submit' %}</button>
 					</div>
 				</div>
+			</div>
+			<div id="notifier" class="alert-message info">
+				View <strong id="notifier-counter"></strong> New Messages
 			</div>
 			<div id="stdout">
 			</div>
