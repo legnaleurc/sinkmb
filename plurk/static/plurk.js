@@ -47,7 +47,7 @@
 		right.append( author.append( nameLabel ).append( serviceLabel ) );
 		var content = $( '<p />' ).html( status.content );
 		right.append( content );
-		var timestamp = $( '<p />' ).append( $( '<small />' ).text( status.timestamp.toString() ) );
+		var timestamp = $( '<p />' ).append( $( '<small />' ).text( ( new Date( status.timestamp ) ).toString() ) );
 		right.append( timestamp );
 
 		// find the cleaned content to compare similarity
