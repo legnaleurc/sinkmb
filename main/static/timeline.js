@@ -122,10 +122,21 @@
 					thatWidget.before( widget );
 				}
 			}
-			if( !post.isSimilar() && !post.getWidget().is( ':visible' ) ) {
-				post.getWidget().slideDown();
-			}
 		}
+
+		( function( posts, n, stop ) {
+			if( n === stop ) {
+				return;
+			}
+
+			var post = posts[n];
+			if( !post.isSimilar() && !post.getWidget().is( ':visible' ) ) {
+				post.getWidget().slideDown( 'fast', SinKMB.bind( arguments.callee, posts, n + 1, stop ) );
+			} else {
+				arguments.callee( posts, n + 1, stop );
+			}
+		} )( this.posts, begin, begin + nPosts );
+
 		if( begin + nPosts > this.oldestVisibleIndex ) {
 			this.oldestVisibleIndex = begin + nPosts;
 		}
