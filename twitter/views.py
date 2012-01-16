@@ -111,9 +111,14 @@ def homeTimeline( request ):
 	args = {
 		'include_entities': True,
 	}
-	for k in [ 'since_id', 'max_id' ]:
-		if k in request.POST:
-			args[k] = request.POST[k]
+	if 'since_id' in request.POST:
+		args['since_id'] = request.POST['since_id']
+	if 'max_id' in request.POST:
+		if 'exclude_max_id' in request.POST and request.POST['exclude_max_id']:
+			args['max_id'] = str( long( request.POST['max_id'] ) - 1 )
+		else:
+			args['max_id'] = request.POST['max_id']
+
 	htl = api.home_timeline( **args )
 	tls = []
 	for tl in htl:

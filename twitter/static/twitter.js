@@ -60,8 +60,9 @@
 	Twitter.prototype.pullHistory = function() {
 		var args = {};
 		if( this.oldestStatusID !== null ) {
-			// minus 1 because max_id compares less than or equal
-			args.max_id = parseInt( this.oldestStatusID, 10 ) - 1;
+			// exclude because max_id compares less than or equal
+			args.max_id = this.oldestStatusID;
+			args.exclude_max_id = true;
 		}
 		jQuery.post( '/twitter/home_timeline.cgi', args, SinKMB.bind( function( srv, data, textStatus, message ) {
 			if( textStatus !== 'success' || data === null ) {
