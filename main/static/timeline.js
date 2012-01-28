@@ -71,6 +71,9 @@
 	};
 
 	Timeline.prototype.more = function( nPosts, callback ) {
+		if( SinKMB.services.length === 0 ) {
+			return;
+		}
 		if( this.pendingMore !== null ) {
 			window.clearTimeout( this.pendingMore );
 			this.pendingMore = null;
