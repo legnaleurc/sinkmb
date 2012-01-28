@@ -14,6 +14,7 @@
 			return this;
 		}
 		this.pullNew();
+		return this;
 	};
 
 	Service.prototype.pullNew = function() {
