@@ -1,4 +1,5 @@
 private/settings.py
+static
 autoload
 dbindexer
 django
