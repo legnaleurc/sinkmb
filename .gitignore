@@ -7,6 +7,8 @@
 /djangotoolbox
 /httplib2
 /main/static/bootstrap.css
+/main/static/bootstrap-responsive.css
+/main/static/bootstrap-collapse.js
 /main/static/jquery.js
 /oauth2
 /plurk_oauth

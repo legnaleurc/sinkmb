@@ -40,9 +40,9 @@
 		} ) );
 		left.append( avatar );
 
-		var right = $( '<div class="span9" />' );
+		var right = $( '<div class="span7" />' );
 		var author = $( '<p class="row" />' );
-		var nameLabel = $( '<div class="span8" />' ).append( $( '<strong />' ).text( status.author_display_name ) ).append( document.createTextNode( ' ' ) ).append( $( '<small />' ).text( status.author ) );
+		var nameLabel = $( '<div class="span6" />' ).append( $( '<strong />' ).text( status.author_display_name ) ).append( document.createTextNode( ' ' ) ).append( $( '<small />' ).text( status.author ) );
 		var serviceLabel = $( '<div class="span1" />' ).append( $( '<span class="label" />' ).text( 'Plurk' ) );
 		right.append( author.append( nameLabel ).append( serviceLabel ) );
 		var content = $( '<p />' ).html( status.content );

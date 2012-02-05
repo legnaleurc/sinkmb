@@ -5,10 +5,13 @@
 		<meta name="keywords" content="" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{% block page_title %}{% endblock %}</title>
 		<link href="{{ STATIC_URL }}bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
+		<link href="{{ STATIC_URL }}bootstrap-responsive.css" rel="stylesheet" type="text/css" media="screen" />
 		<link href="{{ STATIC_URL }}style.css" rel="stylesheet" type="text/css" media="screen" />
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}bootstrap-collapse.js"></script>
 		{% if user.is_authenticated %}
 			<script type="text/javascript" src="/csrftoken.js"></script>
 			<script type="text/javascript" src="{{ STATIC_URL }}sinkmb.js"></script>
@@ -17,26 +20,33 @@
 		{% endblock %}
 	</head>
 	<body>
-		<div class="topbar">
-			<div class="fill">
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
 				<div class="container">
+					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</a>
 					<a class="brand" href="{% url main.views.index %}">SinKMB</a>
-					<ul class="nav">
-						{% if user.is_authenticated %}
-							{% for service in entrances %}
-								<li><a href="{{ service.uri }}">{{ service.label }}</a></li>
-							{% endfor %}
-						{% else %}
-							<li><a href="{% url main.views.register %}">{% trans 'Sign up' %}</a></li>
-						{% endif %}
-					</ul>
-					{% block page_head_right %}
-						{% if user.is_authenticated %}
-							<div class="pull-right input">
-								<a class="btn" href="{% url auth_logout %}">{% trans 'Sign out' %}</a>
-							</div>
-						{% endif %}
-					{% endblock %}
+					<div class="nav-collapse">
+						<ul class="nav">
+							{% if user.is_authenticated %}
+								{% for service in entrances %}
+									<li><a href="{{ service.uri }}">{{ service.label }}</a></li>
+								{% endfor %}
+							{% else %}
+								<li><a href="{% url main.views.register %}">{% trans 'Sign up' %}</a></li>
+							{% endif %}
+						</ul>
+						{% block page_head_right %}
+							{% if user.is_authenticated %}
+								<div class="pull-right input">
+									<a class="btn" href="{% url auth_logout %}">{% trans 'Sign out' %}</a>
+								</div>
+							{% endif %}
+						{% endblock %}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -44,9 +54,11 @@
 			<div class="content">
 				{% block page_body %}{% endblock %}
 			</div>
+<!--
 			<footer>
 				<p>This page is a prototype</p>
 			</footer>
+-->
 		</div>
 	</body>
 </html>

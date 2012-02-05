@@ -30,25 +30,27 @@
 
 {% block page_body %}
 	{% if user.is_authenticated %}
-		<div class="row span10">
-			<div class="input">
-				<textarea id="stdin"></textarea>
-				<div class="row">
-					<div class="span1">
-						<span id="word-counter" class="label">0</span>
-					</div>
-					<div class="offset8 span1">
-						<button class="btn primary" type="submit">{% trans 'Submit' %}</button>
+		<div class="row">
+			<div class="span8">
+				<div class="input">
+					<textarea id="stdin"></textarea>
+					<div class="row">
+						<div class="span1">
+							<span id="word-counter" class="label">0</span>
+						</div>
+						<div class="offset6 span1">
+							<button class="btn primary" type="submit">{% trans 'Submit' %}</button>
+						</div>
 					</div>
 				</div>
+				<div id="notifier" class="alert-message info">
+					View <strong id="notifier-counter"></strong> New Messages
+				</div>
+				<div id="stdout">
+				</div>
 			</div>
-			<div id="notifier" class="alert-message info">
-				View <strong id="notifier-counter"></strong> New Messages
+			<div class="span4">
 			</div>
-			<div id="stdout">
-			</div>
-		</div>
-		<div class="span6">
 		</div>
 	{% else %}
 		<h1>You have to <a href="{% url main.views.register %}">Sign up</a> or <strong>Sign in</strong>.</h1>
